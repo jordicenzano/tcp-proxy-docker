@@ -105,3 +105,8 @@ docker exec DOCKER-INSTANCE-ID sh -c "tc qdisc add dev eth0 root netem rate 1000
 [  4] 132.0-134.0 sec   235 KBytes   964 Kbits/sec
 ...
 ```
+
+- Remove the interface limits
+```bash
+docker exec DOCKER-INSTANCE-ID sh -c "tc qdisc del dev eth0 root netem"
+```
