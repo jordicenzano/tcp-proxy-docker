@@ -86,12 +86,12 @@ iperf -c host.docker.internal -i 2 -t 300 -p 6000
 ...
 ```
 
-- Limit the container interface to 1Mbps (the get the `DOCKER-INSTANCE-ID` you can do `docker ps`)
+- Limit the container interface to 1Mbps (to get the `DOCKER-INSTANCE-ID` you can do `docker ps`)
 ```
 docker exec DOCKER-INSTANCE-ID sh -c "tc qdisc add dev eth0 root netem rate 1000kbit"
 ```
 
-- At this point you should see the throughtput decreases to 1Mbps:
+- At this point you should see the throughput decreases to 1Mbps:
 ```
 ...
 [  4] 116.0-118.0 sec   121 MBytes   508 Mbits/sec
