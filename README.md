@@ -47,6 +47,7 @@ ffmpeg -hide_banner -y \
 -c:a aac -b:a 48k \
 -f flv "rtmps://localhost:1935/rtmp/MY-STREAM-KEY"
 ```
+(*) With OBS in MAC you could have certificate problems using RTMPS
 
 - Limit your network to 1Mbps
 ```bash
