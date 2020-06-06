@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
-if [ "$#" -ne 2 ]; then
-    echo "usage: $(basename $0) host port"
+if [ "$#" -ne 3 ]; then
+    echo "usage: $(basename $0) localPort destHost destPort"
     exit 1
 fi
 
-HOST="$1"
-PORT="$2"
+LOCAL_PORT="$1"
+DEST_HOST="$2"
+DEST_PORT="$3"
 
-LISTEN_PORT=${LISTEN_PORT:-${PORT}}
-
-echo "relay TCP/IP connections on :${LISTEN_PORT} to ${HOST}:${PORT}"
-exec socat TCP-LISTEN:${LISTEN_PORT},fork,reuseaddr TCP:${HOST}:${PORT}
+echo "Relay TCP/IP connections on localhost port: ${LOCAL_PORT} to ${DEST_HOST}:${DEST_PORT}"
+socat TCP-LISTEN:${LOCAL_PORT},fork,reuseaddr TCP:${DEST_HOST}:${DEST_PORT}
