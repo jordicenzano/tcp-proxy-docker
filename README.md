@@ -4,7 +4,7 @@
 
 Simple utility to relay tcp traffic to a specific host and port.
 
-It can be useful also to add interferinece (test under stress) a TCP based network connection (ex: Live streaming)
+It can be useful also to add interference (test under stress) a TCP based network connection (ex: Live streaming)
 
 # Pulling docker image from docker hub
 1. Ensure you have [docker](https://www.docker.com) installed
@@ -12,7 +12,7 @@ It can be useful also to add interferinece (test under stress) a TCP based netwo
 
 # Creating the docker image locally (optional)
 1. Ensure you have docker [docker](https://www.docker.com) 
-2. Clone this repo `git clone XXXX`
+2. Clone this repo `git clone git@github.com:jordicenzano/tcp-proxy-docker.git`
 2. From the root dir of this repo `make`
 
 ## Localhost usage
@@ -53,7 +53,7 @@ ffmpeg -hide_banner -y \
 docker exec tcp-relay sh -c "tc qdisc add dev eth0 root netem rate 1000kbit"
 ```
 
-- At this point you can observe/measure how your communicatin protocol deals with those BW restrictions
+- At this point you can observe/measure how your communication protocol deals with those BW restrictions
 
 - Finally remove your network limits
 ```bash
