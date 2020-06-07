@@ -65,48 +65,49 @@ docker exec tcp-relay sh -c "tc qdisc del dev eth0 root"
 
 - Run this command in localhost (iperf server)
 ```bash
-iperf -c host.docker.internal -i 2 -t 300 -p 6000
+iperf -s -i 2 -p 6000
 ```
-- Run iperf client in the container. To open a shell in the container `make shell`
-
+- Start the `tcp-proxy-docker` with this command to get packets from 1935 in localhost and send it (internally) to localhost (`host.docker.internal`) port 6000
 ```bash
-apt-get install iperf
-iperf -c host.docker.internal -i 2 -t 300 -p 6000
+docker run -it --cap-add=NET_ADMIN --name test-net --rm -p 1935:2000 jcenzano/docker-tcp-proxy:latest 2000 host.docker.internal 6000
 ```
-- At this point you should see quite high thoughput, example:
+- Start `iperf` client in localhost pointing to port 1935
+```bash
+iperf -c localhost -i 2 -t 300 -p 1935
+```
+
+- At this point you should see quite high throughput, example:
 ```
 ...
-[  4] 108.0-110.0 sec   114 MBytes   477 Mbits/sec
-[  4] 110.0-112.0 sec   112 MBytes   471 Mbits/sec
-[  4] 112.0-114.0 sec   117 MBytes   490 Mbits/sec
-[  4] 114.0-116.0 sec   115 MBytes   482 Mbits/sec
-[  4] 116.0-118.0 sec   121 MBytes   508 Mbits/sec
-[  4] 118.0-120.0 sec   122 MBytes   512 Mbits/sec
-[  4] 120.0-122.0 sec   122 MBytes   511 Mbits/sec
+[  4]  0.0- 2.0 sec  62.9 MBytes   264 Mbits/sec
+[  4]  2.0- 4.0 sec  73.7 MBytes   309 Mbits/sec
+[  4]  4.0- 6.0 sec  75.1 MBytes   315 Mbits/sec
+[  4]  6.0- 8.0 sec  72.2 MBytes   303 Mbits/sec
+[  4]  8.0-10.0 sec  64.7 MBytes   271 Mbits/sec
+[  4] 10.0-12.0 sec  58.0 MBytes   243 Mbits/sec
+[  4] 12.0-14.0 sec  62.1 MBytes   260 Mbits/sec
 ...
 ```
 
-- Limit the container interface to 1Mbps (to get the `DOCKER-INSTANCE-ID` you can do `docker ps`)
-```
-docker exec DOCKER-INSTANCE-ID sh -c "tc qdisc add dev eth0 root netem rate 1000kbit"
+- Limit the container interface to 1Mbps
+```bash
+docker exec test-net sh -c "tc qdisc add dev eth0 root netem rate 1000kbit"
 ```
 
 - At this point you should see the throughput decreases to 1Mbps:
 ```
 ...
-[  4] 116.0-118.0 sec   121 MBytes   508 Mbits/sec
-[  4] 118.0-120.0 sec   122 MBytes   512 Mbits/sec
-[  4] 120.0-122.0 sec   122 MBytes   511 Mbits/sec
-[  4] 122.0-124.0 sec  28.5 MBytes   120 Mbits/sec
-[  4] 124.0-126.0 sec   402 KBytes  1.65 Mbits/sec <--- HERE GOES DOWN to 1Mbps
-[  4] 126.0-128.0 sec   237 KBytes   969 Kbits/sec
-[  4] 128.0-130.0 sec   235 KBytes   964 Kbits/sec
-[  4] 130.0-132.0 sec   235 KBytes   964 Kbits/sec
-[  4] 132.0-134.0 sec   235 KBytes   964 Kbits/sec
+[  4] 28.0-30.0 sec  61.1 MBytes   256 Mbits/sec
+[  4] 30.0-32.0 sec  61.4 MBytes   258 Mbits/sec
+[  4] 32.0-34.0 sec  57.2 MBytes   240 Mbits/sec
+[  4] 34.0-36.0 sec  52.7 MBytes   221 Mbits/sec
+[  4] 36.0-38.0 sec   212 KBytes   870 Kbits/sec <-- Limit to 1Mbps
+[  4] 38.0-40.0 sec   235 KBytes   964 Kbits/sec
+[  4] 40.0-42.0 sec   235 KBytes   964 Kbits/sec
 ...
 ```
 
 - Remove the interface limits
 ```bash
-docker exec DOCKER-INSTANCE-ID sh -c "tc qdisc del dev eth0 root netem"
+docker exec test-net sh -c "tc qdisc del dev eth0 root netem"
 ```
